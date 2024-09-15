@@ -1,3 +1,6 @@
 test
 .vscode/
 nginx-1.12.2.tar.gz
+testmuduo/muduo_server
+build/
+bin/
