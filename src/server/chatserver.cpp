@@ -1,7 +1,10 @@
 #include "chatserver.hpp"
 #include <functional>
+#include "json.hpp"
+#include <string>
 using namespace std;
 using namespace placeholders;
+using json = nlohmann::json;
 
 ChatServer::ChatServer(EventLoop *loop,
                        const InetAddress &listenAddr,
@@ -24,6 +27,12 @@ void ChatServer::start()
 
 void ChatServer::onConnection(const TcpConnectionPtr& conn)
 {
+    // 客户端断开连接
+    if (!conn->connected())
+    {
+        conn->shutdown();
+    }
+    
 
 }
 
@@ -33,7 +42,11 @@ void ChatServer::onMessage(const TcpConnectionPtr& conn,
                             Buffer* buffer,
                             Timestamp receiveTime)
 {
+    string buf = buffer->retrieveAllAsString();
+    // 数据反序列化
+    json js = json::parse(buf);
 
+    
 }
 
 
