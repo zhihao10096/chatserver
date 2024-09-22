@@ -9,6 +9,7 @@
 #include "offlinemessagemodel.hpp"
 #include "friendmodel.hpp"
 #include "groupmodel.hpp"
+#include "redis.hpp"
 using json = nlohmann::json;
 using namespace std;
 using namespace muduo;
@@ -41,6 +42,9 @@ private:
     // 互斥锁，保证_userConnMap的线程安全
     mutex _connMutex;
 
+    // redis操作对象
+    Redis _redis;
+
 public:
     // 获取单例对象
     static ChatService *instance();
@@ -69,6 +73,9 @@ public:
 
     // 服务器异常，业务重置方法
     void reset();
+
+        // 从redis消息队列中获取订阅的消息
+    void handleRedisSubscribeMessage(int, string);
 };
 
 #endif // CHATSERVICE_H
