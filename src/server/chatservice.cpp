@@ -9,6 +9,7 @@ ChatService::ChatService(/* args */)
     // 成员函数作回调函数，需要使用绑定器
     _msgHandlerMap.insert({LOGIN_MSG, std::bind(&ChatService::login, this, _1, _2, _3)});
     _msgHandlerMap.insert({REG_MSG, std::bind(&ChatService::reg, this, _1, _2, _3)});
+    _msgHandlerMap.insert({ONE_CHAT_ONE, std::bind(&ChatService::oneChat, this, _1, _2, _3)});
 }
 
 ChatService::~ChatService()
@@ -138,4 +139,22 @@ void ChatService::clientCloseException(const TcpConnectionPtr &conn)
         user.setState("offline");
         _userModel.updateState(user);
     }
+}
+
+
+void ChatService::oneChat(const TcpConnectionPtr &conn, json &js, Timestamp time)
+{
+    int toid = js["to"].get<int>();
+    bool userState = false;
+    {
+        lock_guard<mutex> lock(_connMutex);
+        auto it = _userConnMap.find(toid);
+        if (it!=_userConnMap.end())
+        {
+            // 在线，转发消息    服务器主动推送消息给toid用户
+            it->second->send(js.dump());
+            return;
+        }
+    }
+    // toid不在线,存储离线消息
 }
