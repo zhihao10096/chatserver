@@ -5,7 +5,7 @@ void OfflineMsgeModel::insert(int userid, string msg)
 {
     // 1.组装sql语句
     char sql[1024] = {0};
-    sprintf(sql, "insert into offlinemessage values('%d', '%s')",
+    sprintf(sql, "insert into offlinemessage values(%d, '%s')",
             userid, msg.c_str());
 
     MySQL mysql;

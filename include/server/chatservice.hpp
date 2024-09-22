@@ -7,6 +7,7 @@
 #include "json.hpp"
 #include "usermodel.hpp"
 #include "offlinemessagemodel.hpp"
+#include "friendmodel.hpp"
 using json = nlohmann::json;
 using namespace std;
 using namespace muduo;
@@ -30,6 +31,7 @@ private:
     // 数据操作类对象
     UserModel _userModel;
     OfflineMsgeModel _offlineMsgModel;
+    FriendModel _friendModel;
 
     // 存储在线用户的通信连接
     unordered_map<int, TcpConnectionPtr> _userConnMap;
@@ -50,6 +52,8 @@ public:
     MagHandler getHandler(int msgid);
     // 一对一聊天
     void oneChat(const TcpConnectionPtr &conn, json &js, Timestamp time);
+    // 添加好友业务
+    void addFriend(const TcpConnectionPtr &conn, json &js, Timestamp time);
 
     // 处理客户端异常退出
     void clientCloseException(const TcpConnectionPtr &conn);
