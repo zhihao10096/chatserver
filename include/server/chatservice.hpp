@@ -3,6 +3,7 @@
 #include <muduo/net/TcpConnection.h>
 #include <unordered_map>
 #include <functional>
+#include <mutex>
 #include "json.hpp"
 #include "usermodel.hpp"
 using json = nlohmann::json;
@@ -28,6 +29,12 @@ private:
     // 数据操作类对象
     UserModel _userModel;
 
+    // 存储在线用户的通信连接
+    unordered_map<int, TcpConnectionPtr> _userConnMap;
+
+    // 互斥锁，保证_userConnMap的线程安全
+    mutex _connMutex;
+
 public:
     // 获取单例对象
     static ChatService *instance();
@@ -38,6 +45,9 @@ public:
     void reg(const TcpConnectionPtr &conn, json &js, Timestamp time);
     // 获取消息对应的处理器
     MagHandler getHandler(int msgid);
+
+    // 处理客户端异常退出
+    void clientCloseException(const TcpConnectionPtr &conn);
 };
 
 #endif // CHATSERVICE_H

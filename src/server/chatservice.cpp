@@ -25,7 +25,7 @@ ChatService *ChatService::instance()
 void ChatService::login(const TcpConnectionPtr &conn, json &js, Timestamp time)
 {
     // LOG_INFO << "do login service!!";
-    int id = js["id"].get<int>();           //注意这里要转成int
+    int id = js["id"].get<int>(); // 注意这里要转成int
     string pwd = js["password"];
 
     User user = _userModel.query(id);
@@ -42,6 +42,12 @@ void ChatService::login(const TcpConnectionPtr &conn, json &js, Timestamp time)
         }
         else
         {
+            // 登录成功，记录用户连接信息
+            {
+                lock_guard<mutex> lock(_connMutex);
+                _userConnMap.insert({id, conn});
+            }
+
             // 登录成功，更新用户状态
             user.setState("online");
             _userModel.updateState(user);
@@ -107,5 +113,29 @@ MagHandler ChatService::getHandler(int msgid)
     else
     {
         return _msgHandlerMap[msgid];
+    }
+}
+
+void ChatService::clientCloseException(const TcpConnectionPtr &conn)
+{
+    User user;
+    {
+        lock_guard<mutex> lock(_connMutex);
+        for (auto it = _userConnMap.begin(); it != _userConnMap.end(); it++)
+        {
+            if (it->second == conn)
+            {
+                user.setId(it->first);
+                // 从map中删除用户的连接信息
+                _userConnMap.erase(it);
+                break;
+            }
+        }
+    }
+    if (user.getId() != -1)
+    {
+        // 更新用户的状态
+        user.setState("offline");
+        _userModel.updateState(user);
     }
 }
