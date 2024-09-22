@@ -28,7 +28,8 @@ public:
     string getName() { return this->name; }
     string getPwd() { return this->password; }
     string getState() { return this->state; }
-    ~User();
+
+    ~User(){}
 };
 
 #endif // USER_H

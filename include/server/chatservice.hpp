@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <functional>
 #include "json.hpp"
+#include "usermodel.hpp"
 using json = nlohmann::json;
 using namespace std;
 using namespace muduo;
@@ -23,6 +24,9 @@ private:
 
     // 对成员属性初始化
     ChatService(/* args */);
+
+    // 数据操作类对象
+    UserModel _userModel;
 
 public:
     // 获取单例对象
