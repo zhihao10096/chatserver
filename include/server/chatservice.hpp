@@ -8,6 +8,7 @@
 #include "usermodel.hpp"
 #include "offlinemessagemodel.hpp"
 #include "friendmodel.hpp"
+#include "groupmodel.hpp"
 using json = nlohmann::json;
 using namespace std;
 using namespace muduo;
@@ -32,13 +33,13 @@ private:
     UserModel _userModel;
     OfflineMsgeModel _offlineMsgModel;
     FriendModel _friendModel;
+    GroupModel _groupModel;
 
     // 存储在线用户的通信连接
     unordered_map<int, TcpConnectionPtr> _userConnMap;
 
     // 互斥锁，保证_userConnMap的线程安全
     mutex _connMutex;
-    
 
 public:
     // 获取单例对象
@@ -54,6 +55,12 @@ public:
     void oneChat(const TcpConnectionPtr &conn, json &js, Timestamp time);
     // 添加好友业务
     void addFriend(const TcpConnectionPtr &conn, json &js, Timestamp time);
+    // 创建群组业务
+    void createGroup(const TcpConnectionPtr &conn, json &js, Timestamp time);
+    // 加入群组业务
+    void addGroup(const TcpConnectionPtr &conn, json &js, Timestamp time);
+    // 群组聊天业务
+    void groupChat(const TcpConnectionPtr &conn, json &js, Timestamp time);
 
     // 处理客户端异常退出
     void clientCloseException(const TcpConnectionPtr &conn);
