@@ -154,6 +154,12 @@ void ChatService::clientCloseException(const TcpConnectionPtr &conn)
     }
 }
 
+void ChatService::reset()
+{
+    // 把online状态的用户，设置成offline
+    _userModel.resetState();
+}
+
 void ChatService::oneChat(const TcpConnectionPtr &conn, json &js, Timestamp time)
 {
     int toid = js["to"].get<int>();

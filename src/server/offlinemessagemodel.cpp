@@ -19,7 +19,7 @@ void OfflineMsgeModel::remove(int userid)
 {
     // 1.组装sql语句
     char sql[1024] = {0};
-    sprintf(sql, "delete from offlinemessage where uerid =%d", userid);
+    sprintf(sql, "delete from offlinemessage where userid =%d", userid);
 
     MySQL mysql;
     if (mysql.connect())
