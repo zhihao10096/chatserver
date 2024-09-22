@@ -1,8 +1,10 @@
 #include "chatservice.hpp"
 #include "public.hpp"
 #include "muduo/base/Logging.h"
+#include <vector>
 
 using namespace muduo;
+using namespace std;
 
 ChatService::ChatService(/* args */)
 {
@@ -57,6 +59,17 @@ void ChatService::login(const TcpConnectionPtr &conn, json &js, Timestamp time)
             response["errno"] = 0; // 为0表示响应成功
             response["id"] = user.getId();
             response["name"] = user.getName();
+
+            // 查询用户是否有离线消息
+            vector<string> vec = _offlineMsgModel.query(id);
+            if (!vec.empty())
+            {
+                response["offlinemsg"]=vec;
+                // 读取该用户的离线消息后，把该用户的所有离线消息删除掉
+                _offlineMsgModel.remove(id);
+            }
+            
+
             conn->send(response.dump());
         }
     }
@@ -141,7 +154,6 @@ void ChatService::clientCloseException(const TcpConnectionPtr &conn)
     }
 }
 
-
 void ChatService::oneChat(const TcpConnectionPtr &conn, json &js, Timestamp time)
 {
     int toid = js["to"].get<int>();
@@ -149,7 +161,7 @@ void ChatService::oneChat(const TcpConnectionPtr &conn, json &js, Timestamp time
     {
         lock_guard<mutex> lock(_connMutex);
         auto it = _userConnMap.find(toid);
-        if (it!=_userConnMap.end())
+        if (it != _userConnMap.end())
         {
             // 在线，转发消息    服务器主动推送消息给toid用户
             it->second->send(js.dump());
@@ -157,4 +169,5 @@ void ChatService::oneChat(const TcpConnectionPtr &conn, json &js, Timestamp time
         }
     }
     // toid不在线,存储离线消息
+    _offlineMsgModel.insert(toid, js.dump());
 }

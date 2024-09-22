@@ -6,6 +6,7 @@
 #include <mutex>
 #include "json.hpp"
 #include "usermodel.hpp"
+#include "offlinemessagemodel.hpp"
 using json = nlohmann::json;
 using namespace std;
 using namespace muduo;
@@ -28,12 +29,14 @@ private:
 
     // 数据操作类对象
     UserModel _userModel;
+    OfflineMsgeModel _offlineMsgModel;
 
     // 存储在线用户的通信连接
     unordered_map<int, TcpConnectionPtr> _userConnMap;
 
     // 互斥锁，保证_userConnMap的线程安全
     mutex _connMutex;
+    
 
 public:
     // 获取单例对象
